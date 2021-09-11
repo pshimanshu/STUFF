@@ -1,0 +1,200 @@
+[gd_scene load_steps=19 format=2]
+
+[ext_resource path="res://assets/drone.png" type="Texture" id=1]
+[ext_resource path="res://src/actor/Drone.gd" type="Script" id=2]
+[ext_resource path="res://assets/droneGrabberRod.png" type="Texture" id=3]
+[ext_resource path="res://assets/Hook.png" type="Texture" id=4]
+[ext_resource path="res://src/actor/PickRegion.gd" type="Script" id=5]
+
+[sub_resource type="RectangleShape2D" id=1]
+extents = Vector2( 4.82331, 16.0135 )
+
+[sub_resource type="RectangleShape2D" id=2]
+extents = Vector2( 10, 1.76404 )
+
+[sub_resource type="AtlasTexture" id=3]
+atlas = ExtResource( 4 )
+region = Rect2( 0, 0, 32, 32 )
+
+[sub_resource type="AtlasTexture" id=4]
+atlas = ExtResource( 4 )
+region = Rect2( 0, 32, 32, 32 )
+
+[sub_resource type="SpriteFrames" id=5]
+animations = [ {
+"frames": [ SubResource( 3 ) ],
+"loop": true,
+"name": "open",
+"speed": 5.0
+}, {
+"frames": [ SubResource( 4 ) ],
+"loop": true,
+"name": "closed",
+"speed": 5.0
+} ]
+
+[sub_resource type="RectangleShape2D" id=6]
+extents = Vector2( 11.764, 1.76403 )
+
+[sub_resource type="AtlasTexture" id=7]
+atlas = ExtResource( 1 )
+region = Rect2( 0, 0, 32, 32 )
+
+[sub_resource type="AtlasTexture" id=8]
+atlas = ExtResource( 1 )
+region = Rect2( 32, 0, 32, 32 )
+
+[sub_resource type="AtlasTexture" id=9]
+atlas = ExtResource( 1 )
+region = Rect2( 0, 32, 32, 32 )
+
+[sub_resource type="AtlasTexture" id=10]
+atlas = ExtResource( 1 )
+region = Rect2( 32, 32, 32, 32 )
+
+[sub_resource type="SpriteFrames" id=11]
+animations = [ {
+"frames": [ SubResource( 7 ), SubResource( 8 ), SubResource( 9 ), SubResource( 10 ) ],
+"loop": true,
+"name": "default",
+"speed": 5.0
+} ]
+
+[sub_resource type="RectangleShape2D" id=12]
+extents = Vector2( 26.764, 6.76403 )
+
+[sub_resource type="RectangleShape2D" id=13]
+extents = Vector2( 28, 11 )
+
+[node name="Drone" type="KinematicBody2D"]
+collision_mask = 28
+script = ExtResource( 2 )
+g_modifier = 0.01
+motorStrength = 71
+
+[node name="Chain" type="Node2D" parent="."]
+position = Vector2( 0.23597, -11.236 )
+
+[node name="Rod3" type="RigidBody2D" parent="Chain"]
+position = Vector2( 0, 80 )
+collision_layer = 2
+collision_mask = 28
+gravity_scale = 10.0
+
+[node name="RodSprite" type="Sprite" parent="Chain/Rod3"]
+position = Vector2( -2, 3 )
+scale = Vector2( 2, 2 )
+texture = ExtResource( 3 )
+
+[node name="RodHitBox" type="CollisionShape2D" parent="Chain/Rod3"]
+shape = SubResource( 1 )
+
+[node name="PinRod3Grabber" type="PinJoint2D" parent="Chain/Rod3"]
+position = Vector2( 0, 14 )
+node_a = NodePath("..")
+node_b = NodePath("../../Hook/Grabber")
+disable_collision = false
+
+[node name="Rod1" type="RigidBody2D" parent="Chain"]
+position = Vector2( 0, 24 )
+collision_layer = 2
+collision_mask = 28
+gravity_scale = 10.0
+
+[node name="RodSprite" type="Sprite" parent="Chain/Rod1"]
+position = Vector2( -2, 3 )
+scale = Vector2( 2, 2 )
+texture = ExtResource( 3 )
+
+[node name="RodHitBox" type="CollisionShape2D" parent="Chain/Rod1"]
+shape = SubResource( 1 )
+
+[node name="PinRod12" type="PinJoint2D" parent="Chain/Rod1"]
+position = Vector2( 0, 15 )
+node_a = NodePath("..")
+node_b = NodePath("../../Rod2")
+
+[node name="Rod2" type="RigidBody2D" parent="Chain"]
+position = Vector2( 0, 52 )
+collision_layer = 2
+collision_mask = 28
+gravity_scale = 10.0
+
+[node name="RodSprite" type="Sprite" parent="Chain/Rod2"]
+position = Vector2( 2, -3 )
+rotation = 3.14159
+scale = Vector2( 2, 2 )
+texture = ExtResource( 3 )
+
+[node name="RodHitBox" type="CollisionShape2D" parent="Chain/Rod2"]
+shape = SubResource( 1 )
+
+[node name="PinRod23" type="PinJoint2D" parent="Chain/Rod2"]
+position = Vector2( 0, 13 )
+node_a = NodePath("..")
+node_b = NodePath("../../Rod3")
+
+[node name="Hook" type="Node2D" parent="Chain"]
+position = Vector2( -0.23597, 109.236 )
+
+[node name="Grabber" type="RigidBody2D" parent="Chain/Hook"]
+position = Vector2( 0, -9 )
+collision_layer = 2
+collision_mask = 28
+gravity_scale = 10.0
+contacts_reported = 1
+contact_monitor = true
+
+[node name="PickRegion" type="CollisionShape2D" parent="Chain/Hook/Grabber"]
+position = Vector2( -0.23597, 9.23596 )
+shape = SubResource( 2 )
+disabled = true
+script = ExtResource( 5 )
+
+[node name="GrabberSprite" type="AnimatedSprite" parent="Chain/Hook/Grabber"]
+scale = Vector2( 2, 2 )
+frames = SubResource( 5 )
+animation = "open"
+
+[node name="GrabberHitBox" type="CollisionShape2D" parent="Chain/Hook/Grabber"]
+position = Vector2( 0, 2 )
+shape = SubResource( 6 )
+
+[node name="POCLeft" type="Position2D" parent="Chain/Hook/Grabber"]
+position = Vector2( -11.236, 9.23596 )
+
+[node name="POCRight" type="Position2D" parent="Chain/Hook/Grabber"]
+position = Vector2( 10.764, 9.23596 )
+
+[node name="DroneSprite" type="AnimatedSprite" parent="."]
+position = Vector2( 0, -1 )
+scale = Vector2( 2.5802, 2.5802 )
+frames = SubResource( 11 )
+playing = true
+
+[node name="DroneHitBox" type="CollisionShape2D" parent="."]
+position = Vector2( 0.23597, -1.23597 )
+shape = SubResource( 12 )
+
+[node name="Camera" type="Camera2D" parent="."]
+position = Vector2( 0.23597, 125.574 )
+current = true
+limit_smoothed = true
+smoothing_enabled = true
+
+[node name="PinDroneChain" type="PinJoint2D" parent="."]
+position = Vector2( 0.23597, -0.23597 )
+node_a = NodePath("..")
+node_b = NodePath("../Chain/Rod1")
+
+[node name="DamageArea" type="Area2D" parent="."]
+collision_mask = 28
+
+[node name="DamageArea" type="CollisionShape2D" parent="DamageArea"]
+position = Vector2( 0, -3 )
+shape = SubResource( 13 )
+
+[connection signal="body_shape_entered" from="Chain/Hook/Grabber" to="Chain/Hook/Grabber/PickRegion" method="_on_Grabber_body_shape_entered"]
+[connection signal="body_shape_exited" from="Chain/Hook/Grabber" to="Chain/Hook/Grabber/PickRegion" method="_on_Grabber_body_shape_exited"]
+[connection signal="body_entered" from="DamageArea" to="." method="_on_DamageArea_body_entered"]
+[connection signal="body_exited" from="DamageArea" to="." method="_on_DamageArea_body_exited"]
